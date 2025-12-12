@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jussara Hotel - Dashboard Principal</title>
+    <style>
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            margin: 0; 
+            padding: 0; 
+            background-color: #e9ecef;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .header {
+            width: 100%;
+            background-color: #007bff;
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 40px;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 2.5em;
+        }
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            width: 90%;
+            max-width: 1200px;
+        }
+        .menu-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            text-decoration: none;
+            color: #333;
+            transition: transform 0.3s, box-shadow 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 180px;
+        }
+        .menu-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+        }
+        .menu-card h2 {
+            margin-top: 15px;
+            font-size: 1.5em;
+            color: #007bff;
+        }
+        .icon {
+            font-size: 3em;
+            color: #28a745;
+        }
+        .checkout-icon {
+            color: #dc3545;
+        }
+        .panel-icon {
+            color: #ffc107;
+        }
+        .info-panel {
+            margin-top: 40px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            border-left: 5px solid #007bff;
+            width: 90%;
+            max-width: 1200px;
+            font-style: italic;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>Jussara Hotel - Sistema de Gestão (PMS)</h1>
+</div>
+
+<div class="menu-grid">
+
+    <a href="CHECK.html" class="menu-card">
+        <span class="icon">➕</span>
+        <h2>Fazer Check-in / Reserva</h2>
+        <p>Registrar a entrada de um novo hóspede e garantir a integridade dos dados.</p>
+    </a>
+
+    <a href="index.html" class="menu-card">
+        <span class="icon panel-icon">📊</span>
+        <h2>Ver Painel de Ocupação</h2>
+        <p>Visualização em tempo real dos quartos VAGOS e OCUPADOS do hotel.</p>
+    </a>
+
+    <a href="OUT.html" class="menu-card">
+        <span class="icon checkout-icon">🚪</span>
+        <h2>Fazer Check-out / Saída</h2>
+        <p>Finalizar a estadia do hóspede e fechar a conta (liberando o quarto).</p>
+    </a>
+
+    <a href="MANAGER.html" class="menu-card">
+        <span class="icon">👤</span>
+        <h2>Gerenciar Hóspedes</h2>
+        <p>Cadastro e Consulta de Clientes.</p>
+    </a>
+
+</div>
+
+<div class="info-panel">
+    Sistema Jussara V1.0. **Servidor Python (JUSSARA_API.exe) deve estar ativo.**
+</div>
+
+</body>
+</html>

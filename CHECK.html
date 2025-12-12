@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jussara Hotel - Fazer Reserva (Check-in)</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 20px; background-color: #f0f2f5; }
+        .container { max-width: 600px; margin: auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1); }
+        h1 { color: #28a745; text-align: center; border-bottom: 2px solid #28a745; padding-bottom: 10px; margin-bottom: 25px; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: bold; color: #333; }
+        .form-group input, .form-group select { 
+            width: 100%; 
+            padding: 10px; 
+            border: 1px solid #ccc; 
+            border-radius: 6px; 
+            box-sizing: border-box; 
+            font-size: 1em;
+        }
+        button { 
+            width: 100%; 
+            padding: 12px; 
+            background-color: #007bff; 
+            color: white; 
+            border: none; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            font-size: 1.1em; 
+            margin-top: 20px;
+            transition: background-color 0.3s;
+        }
+        button:hover { background-color: #0056b3; }
+        
+        #feedback { margin-top: 20px; padding: 15px; border-radius: 6px; font-weight: bold; text-align: center; }
+        .sucesso { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .erro { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .alerta { background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Check-in / Nova Reserva (Jussara Hotel)</h1>
+    <div id="feedback" class="alerta">Preencha os dados e clique em Reservar.</div>
+
+    <form id="reservaForm">
+        
+        <div class="form-group">
+            <label for="id_hospede">Documento do Hóspede (CPF/Passaporte):</label>
+            <input type="text" id="id_hospede" required placeholder="Ex: 12345678900">
+            <small style="color: #6c757d;">Usado como identificador único.</small>
+        </div>
+
+        <div class="form-group">
+            <label for="id_quarto">Quarto Desejado:</label>
+            <select id="id_quarto" required>
+                <option value="">-- Selecione o Quarto --</option>
+                <option value="102">102 - Standard (Vago)</option>
+                <option value="202">202 - Luxo (Vago)</option>
+                <option value="301">301 - Suíte Master (Vago)</option>
+                </select>
+        </div>
+
+        <div class="form-group">
+            <label for="check_in">Data de Check-in:</label>
+            <input type="date" id="check_in" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="check_out">Data de Check-out Previsto:</label>
+            <input type="date" id="check_out" required>
+        </div>
+
+        <button type="submit">Finalizar Reserva / Check-in</button>
+    </form>
+</div>
+
+<script>
+    const API_RESERVAR_URL = 'http://localhost:5000/reservar';
+    const feedbackDiv = document.getElementById('feedback');
+    const form = document.getElementById('reservaForm');
+
+    function exibirFeedback(mensagem, tipo) {
+        feedbackDiv.className = ''; 
+        feedbackDiv.classList.add(tipo);
+        feedbackDiv.innerHTML = mensagem;
+    }
+
+    form.addEventListener('submit', function(event) {
+        event.preventDefault();
+        
+        const dadosReserva = {
+            id_hospede: document.getElementById('id_hospede').value.trim(),
+            id_quarto: parseInt(document.getElementById('id_quarto').value),
+            check_in: document.getElementById('check_in').value,
+            check_out: document.getElementById('check_out').value
+        };
+
+        exibirFeedback('Enviando solicitação de reserva...', 'alerta');
+
+        // VALIDAÇÃO SIMPLES DE DATAS (Front-end)
+        if (dadosReserva.check_in >= dadosReserva.check_out) {
+            exibirFeedback('❌ Erro: A data de Check-out deve ser posterior à data de Check-in.', 'erro');
+            return;
+        }
+
+        // 1. CHAMA A API PARA REALIZAR A RESERVA
+        fetch(API_RESERVAR_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(dadosReserva)
+        })
+        // Processa a resposta do Servidor Python (201 Sucesso ou 409 Conflito/Erro)
+        .then(response => response.json().then(data => ({ status: response.status, body: data })))
+        .then(({ status, body }) => {
+            
+            if (status === 201) {
+                // Sucesso (Status 201 Created)
+                exibirFeedback(`✅ RESERVA CONFIRMADA! ID: ${body.reserva_id}. Valor Total: R$ ${body.valor_total.toFixed(2)}.`, 'sucesso');
+                form.reset(); // Limpa o formulário após sucesso
+                
+            } else if (status === 409) {
+                // Conflito (Quarto indisponível)
+                exibirFeedback(`❌ FALHA NA RESERVA: ${body.mensagem} (Status 409). Tente outra data ou outro quarto.`, 'erro');
+            
+            } else {
+                // Outros erros (400 Bad Request ou 500 Internal Server Error)
+                exibirFeedback(`❌ ERRO NO SERVIDOR: ${body.mensagem} (${status}).`, 'erro');
+            }
+        })
+        .catch(error => {
+            console.error('Erro na conexão:', error);
+            exibirFeedback('❌ ERRO CRÍTICO: Não foi possível conectar ao Servidor Jussara (API).', 'erro');
+        });
+    });
+
+    // 2. FUNÇÃO AUXILIAR PARA PREENCHIMENTO AUTOMÁTICO DE DATAS
+    document.addEventListener('DOMContentLoaded', () => {
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('check_in').setAttribute('min', today);
+        
+        // Define o check-in como hoje por padrão
+        document.getElementById('check_in').value = today;
+        
+        // Define o check-out como amanhã por padrão
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        document.getElementById('check_out').value = tomorrow.toISOString().split('T')[0];
+    });
+
+</script>
+
+</body>
+</html>

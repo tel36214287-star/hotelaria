@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jussara Hotel - Cadastro de Hóspedes</title>
+    <style>
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            margin: 20px; 
+            background-color: #f0f2f5; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+        }
+        .container { 
+            max-width: 800px; 
+            width: 100%; 
+            margin: auto; 
+            background: white; 
+            padding: 30px; 
+            border-radius: 12px; 
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1); 
+        }
+        h1 { 
+            color: #007bff; /* Cor Azul */
+            border-bottom: 2px solid #007bff; 
+            padding-bottom: 10px; 
+            margin-bottom: 25px; 
+            text-align: center; 
+        }
+        .section { margin-bottom: 30px; padding: 20px; border: 1px solid #ddd; border-radius: 8px; }
+        .section h2 { margin-top: 0; color: #555; }
+
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; color: #333; }
+        .form-group input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
+        
+        button { 
+            padding: 10px 20px; 
+            background-color: #007bff; 
+            color: white; 
+            border: none; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            font-size: 1.0em; 
+            transition: background-color 0.3s; 
+            margin-top: 10px;
+        }
+        button:hover { background-color: #0056b3; }
+        
+        /* Estilos de Feedback */
+        #feedback-cadastro, #feedback-consulta { margin-top: 15px; padding: 12px; border-radius: 6px; font-weight: bold; text-align: center; }
+        .sucesso { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .erro { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background-color: #f8f9fa; color: #333; border: 1px solid #ddd; }
+
+        /* Resultado da Consulta */
+        #resultado-consulta { 
+            margin-top: 20px; 
+            border-top: 1px solid #ccc; 
+            padding-top: 15px; 
+            text-align: left;
+        }
+        #resultado-consulta p { margin: 5px 0; }
+        #resultado-consulta strong { font-weight: bold; color: #007bff; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>👤 Gerenciamento de Hóspedes</h1>
+    <p style="text-align: center; color: #6c757d;">Mantenha o cadastro dos clientes do Jussara sempre atualizado.</p>
+
+    <div class="section">
+        <h2>Consultar Hóspede Existente</h2>
+        <form id="consultaForm">
+            <div class="form-group">
+                <label for="doc_consulta">Documento (CPF, Passaporte, RG):</label>
+                <input type="text" id="doc_consulta" required placeholder="Ex: 12345678900">
+            </div>
+            <button type="submit" style="background-color: #ffc107; color: #333;">🔍 Consultar</button>
+            <div id="feedback-consulta" class="info">Insira o documento para verificar o cadastro.</div>
+        </form>
+        
+        <div id="resultado-consulta" style="display:none;">
+            <p>Nome: <strong id="hospede-nome"></strong></p>
+            <p>Telefone: <strong id="hospede-telefone"></strong></p>
+            <p>E-mail: <strong id="hospede-email"></strong></p>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Cadastrar Novo Hóspede</h2>
+        <form id="cadastroForm">
+            <div class="form-group">
+                <label for="doc_cadastro">Documento (CPF, Passaporte, RG):</label>
+                <input type="text" id="doc_cadastro" required placeholder="Ex: 12345678900">
+            </div>
+            <div class="form-group">
+                <label for="nome_cadastro">Nome Completo:</label>
+                <input type="text" id="nome_cadastro" required placeholder="Ex: Maria da Silva">
+            </div>
+            <div class="form-group">
+                <label for="tel_cadastro">Telefone:</label>
+                <input type="text" id="tel_cadastro" placeholder="(XX) XXXX-XXXX">
+            </div>
+            <div class="form-group">
+                <label for="email_cadastro">E-mail:</label>
+                <input type="email" id="email_cadastro" placeholder="email@cliente.com.br">
+            </div>
+            <button type="submit">💾 Cadastrar Hóspede</button>
+            <div id="feedback-cadastro" class="info">Preencha os dados e cadastre.</div>
+        </form>
+    </div>
+
+</div>
+
+<script>
+    const API_URL_BASE = 'http://localhost:5000/hospede';
+    
+    // --- Funções Auxiliares ---
+    function exibirFeedback(divId, mensagem, tipo) {
+        const feedbackDiv = document.getElementById(divId);
+        feedbackDiv.className = ''; 
+        feedbackDiv.classList.add(tipo);
+        feedbackDiv.innerHTML = mensagem;
+    }
+
+    function exibirResultadoConsulta(hospede) {
+        document.getElementById('hospede-nome').textContent = hospede.nome_hospede || 'N/A';
+        document.getElementById('hospede-telefone').textContent = hospede.telefone || 'N/A';
+        document.getElementById('hospede-email').textContent = hospede.email || 'N/A';
+        document.getElementById('resultado-consulta').style.display = 'block';
+    }
+
+    function limparResultadoConsulta() {
+        document.getElementById('resultado-consulta').style.display = 'none';
+        document.getElementById('hospede-nome').textContent = '';
+    }
+
+    // --- Lógica de Consulta (GET) ---
+    document.getElementById('consultaForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+        limparResultadoConsulta();
+        
+        const documento = document.getElementById('doc_consulta').value.trim();
+
+        if (!documento) {
+            exibirFeedback('feedback-consulta', 'Por favor, insira um documento válido.', 'erro');
+            return;
+        }
+
+        exibirFeedback('feedback-consulta', `Consultando o documento ${documento} na API...`, 'info');
+        
+        // Chamada real para o Servidor Python: GET /hospede/<documento>
+        fetch(`${API_URL_BASE}/${documento}`)
+        .then(response => response.json().then(data => ({ status: response.status, body: data })))
+        .then(({ status, body }) => {
+            if (status === 200) {
+                // Sucesso: Hóspede encontrado
+                exibirResultadoConsulta(body);
+                exibirFeedback('feedback-consulta', `✅ Hóspede encontrado: ${body.nome_hospede}`, 'sucesso');
+            } else if (status === 404) {
+                // Não encontrado
+                exibirFeedback('feedback-consulta', `❌ Hóspede não encontrado. Documento ${documento} precisa ser cadastrado.`, 'erro');
+            } else {
+                // Outros erros
+                exibirFeedback('feedback-consulta', `❌ ERRO: ${body.mensagem || 'Erro desconhecido'} (${status})`, 'erro');
+            }
+        })
+        .catch(error => {
+            console.error('Erro de Rede/Conexão:', error);
+            exibirFeedback('feedback-consulta', '❌ ERRO CRÍTICO: Não foi possível conectar ao Servidor Jussara (API).', 'erro');
+        });
+    });
+
+    // --- Lógica de Cadastro (POST) ---
+    document.getElementById('cadastroForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+        
+        const novoHospede = {
+            documento: document.getElementById('doc_cadastro').value.trim(),
+            nome_hospede: document.getElementById('nome_cadastro').value.trim(),
+            telefone: document.getElementById('tel_cadastro').value.trim(),
+            email: document.getElementById('email_cadastro').value.trim()
+        };
+
+        if (!novoHospede.documento || !novoHospede.nome_hospede) {
+            exibirFeedback('feedback-cadastro', 'Documento e Nome são obrigatórios.', 'erro');
+            return;
+        }
+
+        exibirFeedback('feedback-cadastro', `Enviando cadastro de ${novoHospede.nome_hospede} para a API...`, 'info');
+        
+        // Chamada real para o Servidor Python: POST /hospede
+        fetch(API_URL_BASE, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(novoHospede)
+        })
+        .then(response => response.json().then(data => ({ status: response.status, body: data })))
+        .then(({ status, body }) => {
+            if (status === 201) {
+                // Sucesso: Hóspede criado
+                exibirFeedback('feedback-cadastro', `✅ Hóspede cadastrado! Documento: ${novoHospede.documento}`, 'sucesso');
+                document.getElementById('cadastroForm').reset();
+            } else if (status === 409) {
+                // Conflito: Documento já existe
+                exibirFeedback('feedback-cadastro', `❌ FALHA: Documento já cadastrado. Use a função de Consulta.`, 'erro');
+            } else {
+                // Outros erros
+                exibirFeedback('feedback-cadastro', `❌ ERRO: ${body.mensagem || 'Erro desconhecido'} (${status})`, 'erro');
+            }
+        })
+        .catch(error => {
+            console.error('Erro de Rede/Conexão:', error);
+            exibirFeedback('feedback-cadastro', '❌ ERRO CRÍTICO: Não foi possível conectar ao Servidor Jussara (API).', 'erro');
+        });
+    });
+    
+    // ATUALIZAÇÃO DO LINK NO DASHBOARD (INDEX.HTML)
+    // Lembre-se de mudar o cartão no seu index.html para ser um link funcional:
+    /*
+    <a href="gerenciar_hospedes.html" class="menu-card">
+        <span class="icon">👤</span>
+        <h2>Gerenciar Hóspedes</h2>
+        <p>Cadastro e consulta de informações de clientes.</p>
+    </a>
+    */
+
+</script>
+
+</body>
+</html>
