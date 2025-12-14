@@ -20,11 +20,23 @@
         .vago { background-color: #d4edda; border: 3px solid #28a745; color: #155724; }
         .ocupado { background-color: #f8d7da; border: 3px solid #dc3545; color: #721c24; }
         #ultimo-refresh { text-align: center; margin: 15px 0; font-size: 0.9em; color: #555; }
+        .voltar-menu {
+            display: inline-block;
+            margin-bottom: 20px;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+        .voltar-menu:hover { background-color: #0056b3; }
     </style>
 </head>
 <body>
 
 <div class="container">
+    <a href="index.html" class="voltar-menu">⬅ Voltar ao Menu</a>
     <h1>📅 Painel de Ocupação (Modo Demonstração)</h1>
     <p style="text-align:center; font-style: italic;">Estes dados são estáticos e NÃO vêm da API, mas sim do JSON fornecido.</p>
     <div id="ultimo-refresh"></div>
