@@ -4,5 +4,9 @@
 
    
    https://tel36214287-star.github.io/hotelaria/
+
+   🔗 **Demo Online via GitHub Pages**
+- **Menu Principal:** https://tel36214287-star.github.io/hotelaria/
+- **Painel de Ocupação:** https://tel36214287-star.github.io/hotelaria/index1.html
     
 
