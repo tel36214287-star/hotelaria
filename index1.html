@@ -12,16 +12,13 @@
         .card-quarto { 
             width: 200px; padding: 15px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
             transition: transform 0.2s;
-            cursor: pointer; /* Adicionado para mostrar que é clicável */
+            cursor: pointer;
         }
         .card-quarto:hover { transform: translateY(-5px); }
         .card-quarto h2 { margin-top: 0; font-size: 1.8em; text-align: center; }
         .card-quarto p { margin: 5px 0; font-size: 0.9em; }
-        
-        /* Cores */
-        .vago { background-color: #d4edda; border: 3px solid #28a745; color: #155724; } /* Verde - Vago */
-        .ocupado { background-color: #f8d7da; border: 3px solid #dc3545; color: #721c24; } /* Vermelho - Ocupado */
-        
+        .vago { background-color: #d4edda; border: 3px solid #28a745; color: #155724; }
+        .ocupado { background-color: #f8d7da; border: 3px solid #dc3545; color: #721c24; }
         #ultimo-refresh { text-align: center; margin: 15px 0; font-size: 0.9em; color: #555; }
     </style>
 </head>
@@ -31,73 +28,30 @@
     <h1>📅 Painel de Ocupação (Modo Demonstração)</h1>
     <p style="text-align:center; font-style: italic;">Estes dados são estáticos e NÃO vêm da API, mas sim do JSON fornecido.</p>
     <div id="ultimo-refresh"></div>
-    <div id="painel-quartos">
-        </div>
+    <div id="painel-quartos"></div>
 </div>
 
 <script>
-    // 1. DADOS DE ENTRADA (O SEU JSON FORNECIDO)
     const DADOS_OCUPACAO = [
-        {
-            "id_quarto": 101,
-            "tipo": "Standard",
-            "capacidade": 2,
-            "preco_diaria": 150.0,
-            "status": "OCUPADO",
-            "hospede_nome": "Dona Jussara Silva",
-            "check_out_previsto": "2025-12-14"
-        },
-        {
-            "id_quarto": 102,
-            "tipo": "Standard",
-            "capacidade": 2,
-            "preco_diaria": 150.0,
-            "status": "VAGO",
-            "hospede_nome": null,
-            "check_out_previsto": null
-        },
-        {
-            "id_quarto": 201,
-            "tipo": "Luxo",
-            "capacidade": 3,
-            "preco_diaria": 250.0,
-            "status": "OCUPADO",
-            "hospede_nome": "Sr. João Cliente",
-            "check_out_previsto": "2025-12-12"
-        },
-        {
-            "id_quarto": 202,
-            "tipo": "Luxo",
-            "capacidade": 3,
-            "preco_diaria": 250.0,
-            "status": "VAGO",
-            "hospede_nome": null,
-            "check_out_previsto": null
-        },
-        {
-            "id_quarto": 301,
-            "tipo": "Suíte Master",
-            "capacidade": 4,
-            "preco_diaria": 400.0,
-            "status": "VAGO",
-            "hospede_nome": null,
-            "check_out_previsto": null
-        }
+        { "id_quarto": 101, "tipo": "Standard", "capacidade": 2, "preco_diaria": 150.0, "status": "OCUPADO", "hospede_nome": "Dona Jussara Silva", "check_out_previsto": "2025-12-14" },
+        { "id_quarto": 102, "tipo": "Standard", "capacidade": 2, "preco_diaria": 150.0, "status": "VAGO", "hospede_nome": null, "check_out_previsto": null },
+        { "id_quarto": 201, "tipo": "Luxo", "capacidade": 3, "preco_diaria": 250.0, "status": "OCUPADO", "hospede_nome": "Sr. João Cliente", "check_out_previsto": "2025-12-12" },
+        { "id_quarto": 202, "tipo": "Luxo", "capacidade": 3, "preco_diaria": 250.0, "status": "VAGO", "hospede_nome": null, "check_out_previsto": null },
+        { "id_quarto": 301, "tipo": "Suíte Master", "capacidade": 4, "preco_diaria": 400.0, "status": "VAGO", "hospede_nome": null, "check_out_previsto": null }
     ];
 
     const painelDiv = document.getElementById('painel-quartos');
     const refreshDiv = document.getElementById('ultimo-refresh');
 
     function renderizarPainel(quartos) {
-        painelDiv.innerHTML = ''; // Limpa
+        painelDiv.innerHTML = '';
         quartos.forEach(quarto => {
             const statusClass = quarto.status.toLowerCase();
             const card = document.createElement('div');
-            // Adicionamos um ID e um atributo de dados para o caso de o card ser clicável
             card.id = `quarto-${quarto.id_quarto}`;
             card.className = `card-quarto ${statusClass}`;
             card.setAttribute('data-quarto-id', quarto.id_quarto);
-            
+
             let detalhes = '';
             if (quarto.status === 'OCUPADO') {
                 detalhes = `
@@ -120,24 +74,16 @@
     function formatarData(dataStr) {
         if (!dataStr) return 'N/A';
         const partes = dataStr.split('-');
-        if (partes.length === 3) {
-            return `${partes[2]}/${partes[1]}/${partes[0]}`;
-        }
+        if (partes.length === 3) return `${partes[2]}/${partes[1]}/${partes[0]}`;
         return dataStr;
     }
 
-    // A função principal agora renderiza diretamente os dados estáticos
     function carregarOcupacaoDemo() {
         renderizarPainel(DADOS_OCUPACAO);
         refreshDiv.innerHTML = `Dados carregados do JSON em: ${new Date().toLocaleTimeString('pt-BR')}`;
     }
 
-    // Inicia a demonstração ao carregar a página
-    carregarOcupacaoDemo(); 
-    
-    // NOTA: A simulação NÃO usa setInterval, pois os dados são estáticos. 
-    // No painel real (com API), você usaria o setInterval.
-
+    carregarOcupacaoDemo();
 </script>
 
 </body>
